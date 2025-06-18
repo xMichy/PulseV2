@@ -6,12 +6,14 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "electron-builder"
   },
   "keywords": [],
   "author": "Michele Galliani",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^31.0.1"
+    "electron": "^31.7.7",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "electron-store": "^10.1.0"
