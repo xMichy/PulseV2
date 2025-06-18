@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "electron-builder"
   },
   "keywords": [],
@@ -17,5 +17,19 @@
   },
   "dependencies": {
     "electron-store": "^10.1.0"
+  },
+  "build": {
+    "appId": "com.example.pulse",
+    "productName": "Pulse",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "asar": false
   }
 }

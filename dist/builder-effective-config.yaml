@@ -1,0 +1,12 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.example.pulse
+productName: Pulse
+files:
+  - filter:
+      - '**/*'
+win:
+  target: nsis
+asar: false
+electronVersion: 31.7.7

@@ -1,0 +1,11 @@
+{
+  "name": "pulse",
+  "version": "2.0.0",
+  "description": "Un semplice browser creato con Electron",
+  "main": "main.js",
+  "author": "Michele Galliani",
+  "license": "ISC",
+  "dependencies": {
+    "electron-store": "^10.1.0"
+  }
+}
