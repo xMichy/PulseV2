@@ -1,7 +1,6 @@
 // tools/settings/cookies/cookie-handler.js
 const { ipcMain, session } = require('electron');
 
-// MODIFICATO: La funzione ora è 'async'
 async function setupCookieHandlers() {
   ipcMain.handle('settings:get-all-cookies', async () => {
     return await session.defaultSession.cookies.get({});

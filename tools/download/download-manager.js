@@ -4,9 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('close-download-sidebar');
     const mainContent = document.getElementById('main-content');
     const downloadList = document.getElementById('download-list');
+
     const toggleSidebar = () => mainContent.classList.toggle('sidebar-visible');
+    
     downloadBtn.addEventListener('click', toggleSidebar);
     closeBtn.addEventListener('click', toggleSidebar);
+
     const formatSpeed = (bytesPerSecond) => {
         if (bytesPerSecond < 1024) return `${bytesPerSecond.toFixed(0)} B/s`;
         if (bytesPerSecond < 1024 * 1024) return `${(bytesPerSecond / 1024).toFixed(1)} KB/s`;
@@ -30,49 +33,67 @@ document.addEventListener('DOMContentLoaded', () => {
         if (['exe', 'msi'].includes(ext)) return '⚙️';
         return '📁';
     };
-    const addDownloadItemToUI = (itemData) => {
-        const { id, fileName, totalBytes } = itemData;
+
+    const renderDownloadItem = (itemData, fromHistory = false) => {
+        const { id, fileName, totalBytes, state, path, completionTime } = itemData;
         const item = document.createElement('div');
         item.id = id;
         item.className = 'download-item';
         item.dataset.totalBytes = totalBytes;
+
+        const isFinished = state === 'completed' || state === 'cancelled' || state === 'interrupted';
+
         item.innerHTML = `
             <div class="download-icon">${getIconForFile(fileName)}</div>
             <div class="download-details">
                 <div class="file-name">${fileName || 'N/D'}</div>
-                <div class="progress-bar"><div class="progress"></div></div>
+                <div class="progress-bar" style="display: ${isFinished ? 'none' : 'flex'};"><div class="progress"></div></div>
                 <div class="download-info">
                     <span class="progress-text">Inizializzazione...</span>
                     <span class="speed-text"></span>
                 </div>
                 <div class="download-time"><span class="time-text"></span></div>
-                <div class="progress-actions">
+                <div class="progress-actions" style="display: ${isFinished ? 'none' : 'block'};">
                     <button class="cancel-btn">Annulla</button>
                 </div>
-                <div class="download-actions" style="display: none;">
+                <div class="download-actions" style="display: ${isFinished ? 'block' : 'none'};">
                     <button class="open-file" disabled>Apri file</button>
                     <button class="show-in-folder" disabled>Mostra nella cartella</button>
                     <button class="remove-item">Rimuovi</button>
                 </div>
             </div>`;
+
         item.querySelector('.cancel-btn').addEventListener('click', () => window.api.send('cancel-download', id));
         item.querySelector('.remove-item').addEventListener('click', async () => {
             await window.api.invoke('downloads:remove-from-history', id);
             item.remove();
         });
-        downloadList.prepend(item);
+
+        if (fromHistory) {
+            downloadList.appendChild(item);
+        } else {
+            downloadList.prepend(item);
+        }
+        
+        if (isFinished) {
+            finalizeDownloadItemInUI(itemData);
+        }
     };
+
     const finalizeDownloadItemInUI = (itemData) => {
         const { id, state, path, completionTime } = itemData;
         const item = document.getElementById(id);
         if (!item) return;
+
         item.querySelector('.progress-bar').style.display = 'none';
         item.querySelector('.download-time').style.display = 'none';
         item.querySelector('.progress-actions').style.display = 'none';
         item.querySelector('.speed-text').style.display = 'none';
+
         const progressText = item.querySelector('.progress-text');
         const actions = item.querySelector('.download-actions');
         actions.style.display = 'block';
+
         if (state === 'completed') {
             progressText.textContent = `Completato - ${new Date(completionTime).toLocaleDateString()}`;
             const openBtn = actions.querySelector('.open-file');
@@ -85,22 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
             progressText.textContent = `Download non riuscito: ${state}`;
         }
     };
+
     const loadDownloadHistory = async () => {
-        console.log('[MANAGER] Chiedo la cronologia al backend...');
-        try {
-            const history = await window.api.invoke('downloads:get-history');
-            console.log('[MANAGER] Cronologia ricevuta dal backend:', history);
-            downloadList.innerHTML = '';
-            history.forEach(itemData => {
-                addDownloadItemToUI(itemData);
-                finalizeDownloadItemInUI(itemData);
-            });
-            console.log('[MANAGER] Rendering della cronologia completato.');
-        } catch (error) {
-            console.error('[MANAGER] Errore critico durante il caricamento della cronologia:', error);
-        }
+        const history = await window.api.invoke('downloads:get-history');
+        downloadList.innerHTML = '';
+        history.forEach(itemData => renderDownloadItem(itemData, true));
     };
-    window.api.handleDownloadStarted((itemData) => { addDownloadItemToUI(itemData); });
+
+    window.api.handleDownloadStarted((itemData) => {
+        renderDownloadItem(itemData, false);
+    });
+
     window.api.handleDownloadProgress(({ id, receivedBytes, speed, timeRemaining }) => {
         const item = document.getElementById(id);
         if (!item) return;
@@ -115,6 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         speedText.textContent = formatSpeed(speed);
         timeText.textContent = formatTime(timeRemaining);
     });
-    window.api.handleDownloadComplete((itemData) => { finalizeDownloadItemInUI(itemData); });
+
+    window.api.handleDownloadComplete((itemData) => {
+        finalizeDownloadItemInUI(itemData);
+    });
+
     loadDownloadHistory();
 });

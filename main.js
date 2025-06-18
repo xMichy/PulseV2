@@ -1,11 +1,12 @@
 // main.js
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+
 const { setupDownloadHandler } = require('./tools/download/download-handler.js');
 const { setupCookieHandlers } = require('./tools/settings/cookies/cookie-handler.js'); 
 
+// La funzione ora è 'async' per poter usare 'await'
 async function createWindow() {
-  console.log('[MAIN] Inizio creazione finestra...');
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -17,17 +18,16 @@ async function createWindow() {
     }
   });
 
-  console.log('[MAIN] Inizio configurazione handlers...');
+  // Attendiamo che i gestori del backend siano pronti...
   await setupDownloadHandler(mainWindow);
   await setupCookieHandlers(); 
-  console.log('[MAIN] Configurazione handlers completata.');
 
+  // ...E SOLO DOPO carichiamo la pagina!
   mainWindow.loadFile('index.html');
-  console.log('[MAIN] Chiamata a loadFile(\'index.html\') eseguita.');
 }
 
+// Anche il blocco .then() ora chiama una funzione async
 app.whenReady().then(async () => {
-  console.log('[MAIN] App pronta. Chiamo createWindow...');
   await createWindow();
 
   app.on('activate', async function () {

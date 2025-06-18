@@ -1,5 +1,4 @@
 // preload.js
-
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
@@ -13,8 +12,7 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke(channel, data);
   },
 
-  // MODIFICATO: Sostituiamo la funzione generica 'on' con gestori specifici e chiari
-  // per ogni evento di download. Questo risolverà il problema di comunicazione.
+  // Gestori specifici e chiari per ogni evento di download
   handleDownloadStarted: (callback) => {
     ipcRenderer.on('download-started', (event, ...args) => callback(...args));
   },
