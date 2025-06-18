@@ -1,0 +1,14 @@
+body { font-family: sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+.container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+h1, h2 { color: #111; }
+.domain-item { border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; }
+.domain-summary { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: #fafafa; }
+.domain-summary:hover { background-color: #eee; }
+.domain-name { font-weight: bold; }
+.cookie-count { font-size: 0.9em; color: #555; }
+.cookie-details { padding: 0 15px 15px 15px; border-top: 1px solid #ddd; }
+.cookie-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+.cookie-entry:last-child { border-bottom: none; }
+.cookie-name { font-family: monospace; font-size: 0.9em; }
+.delete-cookie-btn { background: #ff4d4d; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+.delete-cookie-btn:hover { background: #cc0000; }

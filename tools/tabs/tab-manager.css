@@ -1,0 +1,98 @@
+/* tools/tabs/tab-manager.css */
+
+#app-container { display: flex; flex-direction: column; height: 100vh; }
+#main-content { display: flex; flex-grow: 1; overflow: hidden; }
+
+/* Barra delle schede */
+#tab-bar {
+    display: flex;
+    align-items: center;
+    background-color: #21222c;
+    padding: 5px 5px 0 5px;
+    min-height: 40px;
+}
+
+/* Singola scheda */
+.tab {
+    display: flex;
+    align-items: center;
+    background-color: #44475a;
+    color: #f8f8f2;
+    padding: 8px 10px;
+    margin-right: 2px;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    border: 1px solid #6272a4;
+    border-bottom: none;
+    max-width: 200px;
+    position: relative;
+    bottom: -1px;
+}
+
+.tab.active {
+    background-color: #383a49; /* Colore di sfondo dei controlli per un effetto unito */
+    border-color: #4d4d4d;
+}
+
+.tab-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.tab-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.close-tab-btn {
+    background: none;
+    border: none;
+    color: #f8f8f2;
+    margin-left: 10px;
+    padding: 0 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.close-tab-btn:hover { background-color: #6272a4; }
+
+#new-tab-btn {
+    background: #44475a;
+    color: #f8f8f2;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+#new-tab-btn:hover { background: #6272a4; }
+
+/* Controlli principali */
+#controls {
+    display: flex;
+    gap: 5px;
+    padding: 8px;
+    background-color: #383a49;
+    border-bottom: 1px solid #282a36;
+}
+#controls input { flex-grow: 1; padding: 5px; border-radius: 3px; border: 1px solid #6272a4; background: #282a36; color: white; }
+#controls button { padding: 5px 10px; border: 1px solid #6272a4; background: #44475a; color: white; border-radius: 3px; }
+#controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Contenitore delle Webview */
+#webview-container { flex-grow: 1; position: relative; }
+webview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+/* Nascondiamo le webview non attive */
+webview:not(.active) {
+    display: none;
+}

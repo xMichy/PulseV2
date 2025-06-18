@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pulse</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; overflow: hidden; background-color: #282a36; }
+    </style>
+    <link rel="stylesheet" href="./tools/tabs/tab-manager.css">
+    <link rel="stylesheet" href="./tools/download/download.css">
+</head>
+<body>
+    <div id="app-container">
+        <div id="tab-bar">
+            <button id="new-tab-btn">+</button>
+        </div>
+
+        <div id="controls">
+            <button id="backBtn" disabled>←</button>
+            <button id="fwdBtn" disabled>→</button>
+            <button id="reloadBtn">↻</button>
+            <input type="text" id="urlInput" placeholder="Cerca o inserisci un indirizzo web">
+            <button id="goBtn">Vai</button>
+            <button id="downloadBtn" style="margin-left: auto;">↓</button>
+            <button id="settingsBtn">⚙️</button>
+        </div>
+
+        <div id="main-content">
+            <div id="webview-container">
+                </div>
+
+            <div id="download-sidebar">
+                <div class="header">
+                    <h3>Download</h3>
+                    <button id="close-download-sidebar">X</button>
+                </div>
+                <div id="download-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./renderer.js"></script>
+    <script src="./tools/tabs/tab-manager.js"></script>
+    <script src="./tools/download/download-manager.js"></script>
+</body>
+</html>
