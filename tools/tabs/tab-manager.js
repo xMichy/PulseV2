@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabElement.className = 'tab';
         tabElement.dataset.tabId = tabId;
         tabElement.innerHTML = `
-            <img class="tab-icon" src="default-icon.png">
+            <img class="tab-icon" src="./tools/tabs/default-icon.png">
             <span class="tab-title">Nuova scheda</span>
             <button class="close-tab-btn">×</button>
         `;
@@ -32,14 +32,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const webview = document.createElement('webview');
         webview.className = 'webview';
         webview.setAttribute('src', url);
+        // CORREZIONE DEFINITIVA: Usa un percorso relativo standard per il preload.
+        // Questo è il modo corretto e non causa crash.
+        webview.setAttribute('preload', './preload.js');
+
+        tabs.set(tabId, { id: tabId, element: tabElement, webview: webview, title: 'Nuova scheda', isReady: false });
+
         webviewContainer.appendChild(webview);
 
-        tabs.set(tabId, { id: tabId, element: tabElement, webview: webview, title: 'Nuova scheda' });
+        const onDomReady = () => {
+            const tab = tabs.get(tabId);
+            if (tab) {
+                tab.isReady = true;
+                if (tabId === activeTabId) {
+                    updateNavControls();
+                }
+            }
+        };
+
+        webview.addEventListener('dom-ready', onDomReady);
         
         webview.addEventListener('did-navigate', (e) => {
             if (tabId === activeTabId) {
                 urlInput.value = e.url;
-                updateNavButtons();
+                updateNavControls();
             }
         });
         webview.addEventListener('page-title-updated', (e) => {
@@ -48,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         webview.addEventListener('page-favicon-updated', (e) => {
             if (e.favicons && e.favicons.length > 0) {
                 tabElement.querySelector('.tab-icon').src = e.favicons[0];
+            } else {
+                tabElement.querySelector('.tab-icon').src = './tools/tabs/default-icon.png';
             }
         });
 
@@ -68,13 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.webview.classList.toggle('active', isActive);
         });
         
-        const activeTab = getActiveTab();
-        if (activeTab) {
-            urlInput.value = activeTab.webview.getURL();
-            updateNavButtons();
-        }
+        updateNavControls();
     };
-
+    
     const closeTab = (tabId) => {
         const tabToClose = tabs.get(tabId);
         if (!tabToClose) return;
@@ -88,16 +102,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (remainingTabs.length > 0) {
                 switchToTab(remainingTabs[remainingTabs.length - 1]);
             } else {
+                activeTabId = null; // Resetta l'ID attivo
                 createNewTab();
             }
         }
     };
 
-    const updateNavButtons = () => {
+    const updateNavControls = () => {
         const tab = getActiveTab();
-        if (tab) {
+        if (tab && tab.isReady) {
+            urlInput.value = tab.webview.getURL();
             backBtn.disabled = !tab.webview.canGoBack();
             fwdBtn.disabled = !tab.webview.canGoForward();
+        } else {
+            // Se la tab non è pronta, disabilita i controlli
+            urlInput.value = '';
+            backBtn.disabled = true;
+            fwdBtn.disabled = true;
         }
     };
     
@@ -107,20 +128,41 @@ document.addEventListener('DOMContentLoaded', () => {
     fwdBtn.addEventListener('click', () => getActiveTab()?.webview.goForward());
     reloadBtn.addEventListener('click', () => getActiveTab()?.webview.reload());
     
-    goBtn.addEventListener('click', () => {
-        let url = urlInput.value;
-        if (!/^(https?|file):\/\//.test(url)) {
-            url = 'https://' + url;
+    const navigate = () => {
+        const input = urlInput.value.trim();
+        if (!input) {
+            return;
         }
-        getActiveTab()?.webview.loadURL(url);
-    });
+
+        let finalUrl;
+
+        // Controlla se l'input è un URL valido (contiene un punto, niente spazi, o è localhost)
+        const isUrl = (input.includes('.') && !/\s/.test(input)) || input.toLowerCase().startsWith('localhost');
+        
+        if (isUrl) {
+            // Se è un URL ma manca il protocollo, lo aggiungiamo.
+            if (!/^(https?|file):\/\//.test(input)) {
+                finalUrl = 'https://' + input;
+            } else {
+                finalUrl = input;
+            }
+        } else {
+            // Altrimenti, lo trattiamo come un termine di ricerca per Google.
+            finalUrl = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+        }
+        
+        // Carica l'URL nella webview della scheda attiva.
+        getActiveTab()?.webview.loadURL(finalUrl);
+    };
+
+    goBtn.addEventListener('click', navigate);
 
     urlInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') goBtn.click();
+        if (e.key === 'Enter') {
+            navigate();
+        }
     });
 
-    // CORREZIONE: L'event listener per le impostazioni era nel posto sbagliato.
-    // Ora è qui fuori, al suo posto.
     settingsBtn.addEventListener('click', () => {
         createNewTab('./tools/settings/settings.html');
     });

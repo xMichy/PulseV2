@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadList = document.getElementById('download-list');
 
     const toggleSidebar = () => mainContent.classList.toggle('sidebar-visible');
-    
     downloadBtn.addEventListener('click', toggleSidebar);
     closeBtn.addEventListener('click', toggleSidebar);
 
@@ -34,11 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return '📁';
     };
 
-    const renderDownloadItem = (itemData, fromHistory = false) => {
+    const createOrUpdateItemUI = (itemData) => {
         const { id, fileName, totalBytes, state, path, completionTime } = itemData;
-        const item = document.createElement('div');
-        item.id = id;
-        item.className = 'download-item';
+        let item = document.getElementById(id);
+
+        // Se l'elemento non esiste, lo creiamo da zero
+        if (!item) {
+            item = document.createElement('div');
+            item.id = id;
+            item.className = 'download-item';
+            downloadList.prepend(item); // I nuovi download appaiono in cima
+        }
         item.dataset.totalBytes = totalBytes;
 
         const isFinished = state === 'completed' || state === 'cancelled' || state === 'interrupted';
@@ -49,91 +54,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="file-name">${fileName || 'N/D'}</div>
                 <div class="progress-bar" style="display: ${isFinished ? 'none' : 'flex'};"><div class="progress"></div></div>
                 <div class="download-info">
-                    <span class="progress-text">Inizializzazione...</span>
-                    <span class="speed-text"></span>
+                    <span class="progress-text">${isFinished ? (state === 'completed' ? `Completato` : `Fallito: ${state}`) : 'Inizializzazione...'}</span>
+                    <span class="speed-text" style="display: ${isFinished ? 'none' : 'block'};"></span>
                 </div>
-                <div class="download-time"><span class="time-text"></span></div>
+                <div class="download-time" style="display: ${isFinished ? 'none' : 'block'};"><span class="time-text"></span></div>
                 <div class="progress-actions" style="display: ${isFinished ? 'none' : 'block'};">
                     <button class="cancel-btn">Annulla</button>
                 </div>
                 <div class="download-actions" style="display: ${isFinished ? 'block' : 'none'};">
-                    <button class="open-file" disabled>Apri file</button>
-                    <button class="show-in-folder" disabled>Mostra nella cartella</button>
+                    <button class="open-file" ${state !== 'completed' ? 'disabled' : ''}>Apri file</button>
+                    <button class="show-in-folder" ${state === 'completed' ? '' : 'disabled'}>Mostra cartella</button>
                     <button class="remove-item">Rimuovi</button>
                 </div>
             </div>`;
 
-        item.querySelector('.cancel-btn').addEventListener('click', () => window.api.send('cancel-download', id));
+        // Aggiungi gli event listener
+        if (!isFinished) {
+            item.querySelector('.cancel-btn').addEventListener('click', () => window.api.send('cancel-download', id));
+        } else {
+            if (state === 'completed') {
+                item.querySelector('.open-file').addEventListener('click', () => window.api.send('download-action', { action: 'open', path }));
+                item.querySelector('.show-in-folder').addEventListener('click', () => window.api.send('download-action', { action: 'show', path }));
+            }
+        }
         item.querySelector('.remove-item').addEventListener('click', async () => {
             await window.api.invoke('downloads:remove-from-history', id);
             item.remove();
         });
-
-        if (fromHistory) {
-            downloadList.appendChild(item);
-        } else {
-            downloadList.prepend(item);
-        }
-        
-        if (isFinished) {
-            finalizeDownloadItemInUI(itemData);
-        }
-    };
-
-    const finalizeDownloadItemInUI = (itemData) => {
-        const { id, state, path, completionTime } = itemData;
-        const item = document.getElementById(id);
-        if (!item) return;
-
-        item.querySelector('.progress-bar').style.display = 'none';
-        item.querySelector('.download-time').style.display = 'none';
-        item.querySelector('.progress-actions').style.display = 'none';
-        item.querySelector('.speed-text').style.display = 'none';
-
-        const progressText = item.querySelector('.progress-text');
-        const actions = item.querySelector('.download-actions');
-        actions.style.display = 'block';
-
-        if (state === 'completed') {
-            progressText.textContent = `Completato - ${new Date(completionTime).toLocaleDateString()}`;
-            const openBtn = actions.querySelector('.open-file');
-            const showBtn = actions.querySelector('.show-in-folder');
-            openBtn.disabled = false;
-            showBtn.disabled = false;
-            openBtn.addEventListener('click', () => window.api.send('download-action', { action: 'open', path }));
-            showBtn.addEventListener('click', () => window.api.send('download-action', { action: 'show', path }));
-        } else {
-            progressText.textContent = `Download non riuscito: ${state}`;
-        }
     };
 
     const loadDownloadHistory = async () => {
         const history = await window.api.invoke('downloads:get-history');
         downloadList.innerHTML = '';
-        history.forEach(itemData => renderDownloadItem(itemData, true));
+        history.forEach(itemData => createOrUpdateItemUI(itemData));
     };
 
     window.api.handleDownloadStarted((itemData) => {
-        renderDownloadItem(itemData, false);
+        createOrUpdateItemUI(itemData);
     });
 
     window.api.handleDownloadProgress(({ id, receivedBytes, speed, timeRemaining }) => {
         const item = document.getElementById(id);
         if (!item) return;
-        const progressBar = item.querySelector('.progress');
-        const progressText = item.querySelector('.progress-text');
-        const speedText = item.querySelector('.speed-text');
-        const timeText = item.querySelector('.time-text');
-        const totalBytes = parseFloat(item.dataset.totalBytes);
-        const percent = totalBytes > 0 ? (receivedBytes / totalBytes) * 100 : 0;
-        progressBar.style.width = `${percent}%`;
-        progressText.textContent = `${(receivedBytes / 1048576).toFixed(2)} MB / ${(totalBytes / 1048576).toFixed(2)} MB`;
-        speedText.textContent = formatSpeed(speed);
-        timeText.textContent = formatTime(timeRemaining);
+        item.querySelector('.progress').style.width = `${(receivedBytes / item.dataset.totalBytes) * 100}%`;
+        item.querySelector('.progress-text').textContent = `${(receivedBytes / 1048576).toFixed(2)} MB / ${(item.dataset.totalBytes / 1048576).toFixed(2)} MB`;
+        item.querySelector('.speed-text').textContent = formatSpeed(speed);
+        item.querySelector('.time-text').textContent = formatTime(timeRemaining);
     });
 
     window.api.handleDownloadComplete((itemData) => {
-        finalizeDownloadItemInUI(itemData);
+        createOrUpdateItemUI(itemData);
     });
 
     loadDownloadHistory();

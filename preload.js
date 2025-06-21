@@ -9,8 +9,12 @@ contextBridge.exposeInMainWorld('api', {
   
   // Per messaggi con risposta (Renderer <-> Main)
   invoke: (channel, data) => {
-    ipcRenderer.invoke(channel, data);
+    return ipcRenderer.invoke(channel, data);
   },
+
+  // API specifiche per i cookie
+  getAllCookies: () => ipcRenderer.invoke('settings:get-all-cookies'),
+  deleteCookie: (cookieData) => ipcRenderer.invoke('settings:delete-cookie', cookieData),
 
   // Gestori specifici e chiari per ogni evento di download
   handleDownloadStarted: (callback) => {

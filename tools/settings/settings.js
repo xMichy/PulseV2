@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteBtn.className = 'delete-cookie-btn';
                 deleteBtn.onclick = async () => {
                     const url = `http${cookie.secure ? 's' : ''}://${cookie.domain}${cookie.path}`;
-                    // Invia la richiesta di eliminazione e renderizza di nuovo la lista con i dati aggiornati
+                    // RIPRISTINO: Usa la chiamata 'invoke' generica, che ora funziona
                     const updatedCookies = await window.api.invoke('settings:delete-cookie', { url, name: cookie.name });
                     renderCookies(updatedCookies);
                 };
@@ -64,8 +64,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carica i cookie all'avvio della pagina
     async function loadAndRenderCookies() {
-        const allCookies = await window.api.invoke('settings:get-all-cookies');
-        renderCookies(allCookies);
+        console.log('[FRONTEND] Tentativo di caricare i cookie...');
+        cookieContainer.innerHTML = '<p>Caricamento cookie...</p>';
+        try {
+            const allCookies = await window.api.invoke('settings:get-all-cookies');
+            console.log('[FRONTEND] Ricevuti dati dal backend:', allCookies);
+            if (allCookies) {
+                console.log(`[FRONTEND] Rendering di ${allCookies.length} cookie.`);
+                renderCookies(allCookies);
+            } else {
+                console.warn('[FRONTEND] Ricevuto un valore nullo o undefined dal backend.');
+                cookieContainer.innerHTML = '<p class="error">Impossibile caricare i cookie (dati non validi).</p>';
+            }
+        } catch (error) {
+            console.error('[FRONTEND] Errore API nel caricamento dei cookie:', error);
+            cookieContainer.innerHTML = '<p class="error">Impossibile caricare i cookie (errore API).</p>';
+        }
     }
 
     loadAndRenderCookies();

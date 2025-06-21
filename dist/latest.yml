@@ -1,8 +1,8 @@
 version: 2.0.0
 files:
   - url: Pulse-Setup-2.0.0.exe
-    sha512: T/BysTtxfEmr0l4s/Tk9svTF5+Gcjh2a//Dcd/Lz35XEHy/8/Cuh72Jgh8kpvrFH471zbMKkGCtqTszhA8yilw==
-    size: 78712719
+    sha512: rvmcmE4+744f/95pN4wvtVeXuekyNmhT9fCw54txiWC24XbC5kyLxMqtNZpX5X59R8tpJBl7AoHAQJNR96P1wQ==
+    size: 78712583
 path: Pulse-Setup-2.0.0.exe
-sha512: T/BysTtxfEmr0l4s/Tk9svTF5+Gcjh2a//Dcd/Lz35XEHy/8/Cuh72Jgh8kpvrFH471zbMKkGCtqTszhA8yilw==
-releaseDate: '2025-06-18T16:27:19.645Z'
+sha512: rvmcmE4+744f/95pN4wvtVeXuekyNmhT9fCw54txiWC24XbC5kyLxMqtNZpX5X59R8tpJBl7AoHAQJNR96P1wQ==
+releaseDate: '2025-06-18T16:32:25.984Z'

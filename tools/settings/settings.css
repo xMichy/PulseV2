@@ -12,3 +12,13 @@ h1, h2 { color: #111; }
 .cookie-name { font-family: monospace; font-size: 0.9em; }
 .delete-cookie-btn { background: #ff4d4d; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
 .delete-cookie-btn:hover { background: #cc0000; }
+
+.error {
+    color: #cc0000;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    background-color: #fff0f0;
+    border: 1px solid #ff4d4d;
+    border-radius: 5px;
+}

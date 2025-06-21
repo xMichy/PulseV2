@@ -83,9 +83,45 @@
 
 
 /* --- Stili per gli elementi interni della sidebar (invariati) --- */
-#download-sidebar .header { min-width: 330px; display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #3a3a3a; flex-shrink: 0; }
-#download-sidebar .header h3 { margin: 0; }
-#download-sidebar .header button { background: none; border: none; color: #f0f0f0; font-size: 16px; cursor: pointer; }
+#download-sidebar .header { 
+    min-width: 330px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px; 
+    background-color: #3a3a3a; 
+    flex-shrink: 0; 
+}
+
+#download-sidebar .header h3 { 
+    margin: 0; 
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#download-sidebar .header button { 
+    background: none; 
+    border: none; 
+    color: #f0f0f0; 
+    font-size: 16px; 
+    cursor: pointer; 
+    padding: 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+#download-sidebar .header button:hover {
+    background-color: #555;
+}
+
+#clear-history-btn {
+    font-size: 14px !important;
+}
+
 #download-list { overflow-y: auto; flex-grow: 1; padding: 10px; }
 .download-item { background-color: #3c3c3c; border-radius: 4px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 .download-icon { font-size: 24px; flex-shrink: 0; }
@@ -95,3 +131,19 @@
 .progress { width: 0%; height: 100%; background-color: #4a90e2; border-radius: 2px; }
 .download-info, .download-actions { font-size: 12px; color: #aaa; margin-top: 5px; }
 .download-actions button { background: none; border: none; color: #4a90e2; text-decoration: underline; cursor: pointer; padding: 0 5px 0 0; }
+
+/* Stili per i messaggi di stato */
+.no-downloads, .error {
+    text-align: center;
+    padding: 20px;
+    color: #aaa;
+    font-style: italic;
+    background-color: #3c3c3c;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.error {
+    color: #ff6b6b;
+    border-left: 3px solid #ff6b6b;
+}

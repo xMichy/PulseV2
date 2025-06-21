@@ -2,12 +2,26 @@
 document.addEventListener('DOMContentLoaded', () => {
     const downloadBtn = document.getElementById('downloadBtn');
     const closeBtn = document.getElementById('close-download-sidebar');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
     const mainContent = document.getElementById('main-content');
     const downloadList = document.getElementById('download-list');
 
     const toggleSidebar = () => mainContent.classList.toggle('sidebar-visible');
     downloadBtn.addEventListener('click', toggleSidebar);
     closeBtn.addEventListener('click', toggleSidebar);
+
+    // Gestione pulizia cronologia
+    clearHistoryBtn.addEventListener('click', async () => {
+        if (confirm('Sei sicuro di voler cancellare tutta la cronologia dei download?')) {
+            try {
+                await window.api.invoke('downloads:clear-history');
+                downloadList.innerHTML = '<div class="no-downloads">Nessun download nella cronologia</div>';
+                console.log('Cronologia download pulita');
+            } catch (error) {
+                console.error('Errore nella pulizia della cronologia:', error);
+            }
+        }
+    });
 
     const formatSpeed = (bytesPerSecond) => {
         if (bytesPerSecond < 1024) return `${bytesPerSecond.toFixed(0)} B/s`;
@@ -84,12 +98,43 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadDownloadHistory = async () => {
-        const history = await window.api.invoke('downloads:get-history');
-        downloadList.innerHTML = '';
-        history.forEach(itemData => createOrUpdateItemUI(itemData));
+        try {
+            console.log('Caricamento cronologia download...');
+            const history = await window.api.invoke('downloads:get-history');
+            console.log('Cronologia caricata:', history);
+            
+            // Pulisci la lista prima di caricare
+            downloadList.innerHTML = '';
+            
+            if (history && history.length > 0) {
+                history.forEach(itemData => {
+                    console.log('Aggiungendo item alla cronologia:', itemData);
+                    createOrUpdateItemUI(itemData);
+                });
+            } else {
+                console.log('Nessun download nella cronologia');
+                // Aggiungi un messaggio se non ci sono download
+                downloadList.innerHTML = '<div class="no-downloads">Nessun download nella cronologia</div>';
+            }
+        } catch (error) {
+            console.error('Errore nel caricamento della cronologia download:', error);
+            downloadList.innerHTML = '<div class="error">Errore nel caricamento della cronologia</div>';
+        }
     };
 
+    // Carica la cronologia immediatamente
+    loadDownloadHistory();
+
+    // Ricarica la cronologia quando la sidebar viene aperta
+    downloadBtn.addEventListener('click', () => {
+        // Aggiungi un piccolo delay per assicurarsi che la sidebar sia aperta
+        setTimeout(() => {
+            loadDownloadHistory();
+        }, 100);
+    });
+
     window.api.handleDownloadStarted((itemData) => {
+        console.log('Download iniziato:', itemData);
         createOrUpdateItemUI(itemData);
     });
 
@@ -103,8 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.api.handleDownloadComplete((itemData) => {
+        console.log('Download completato:', itemData);
         createOrUpdateItemUI(itemData);
     });
-
-    loadDownloadHistory();
 });

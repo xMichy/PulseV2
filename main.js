@@ -20,7 +20,7 @@ async function createWindow() {
 
   // Attendiamo che i gestori del backend siano pronti...
   await setupDownloadHandler(mainWindow);
-  await setupCookieHandlers(); 
+  await setupCookieHandlers(mainWindow); 
 
   // ...E SOLO DOPO carichiamo la pagina!
   mainWindow.loadFile('index.html');

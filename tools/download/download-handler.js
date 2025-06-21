@@ -8,15 +8,25 @@ async function setupDownloadHandler(mainWindow) {
   const store = new Store();
   const ses = session.defaultSession;
 
+  // Inizializza la cronologia se non esiste
+  if (!store.has('downloadHistory')) {
+    store.set('downloadHistory', []);
+    console.log('Cronologia download inizializzata');
+  }
+
   ses.on('will-download', (event, item, webContents) => {
     const downloadId = `download-${Date.now()}-${Math.random()}`;
     const totalBytes = item.getTotalBytes();
     activeDownloads.set(downloadId, { item, lastBytes: 0, lastTime: Date.now() });
+    
+    console.log('Download iniziato:', { id: downloadId, fileName: item.getFilename(), totalBytes });
+    
     mainWindow.webContents.send('download-started', {
       id: downloadId,
       fileName: item.getFilename(),
       totalBytes: totalBytes
     });
+    
     item.on('updated', (event, state) => {
         if (state === 'progressing') {
             const receivedBytes = item.getReceivedBytes();
@@ -34,6 +44,7 @@ async function setupDownloadHandler(mainWindow) {
             }
         }
     });
+    
     item.on('done', (event, state) => {
       activeDownloads.delete(downloadId);
       const newEntry = {
@@ -44,11 +55,22 @@ async function setupDownloadHandler(mainWindow) {
         state: state,
         completionTime: new Date().toISOString()
       };
+      
+      console.log('Download completato:', newEntry);
+      
       if (state === 'completed' || state === 'cancelled' || state === 'interrupted') {
           const history = store.get('downloadHistory', []);
           history.unshift(newEntry);
+          
+          // Mantieni solo gli ultimi 100 download per evitare che la cronologia diventi troppo grande
+          if (history.length > 100) {
+            history.splice(100);
+          }
+          
           store.set('downloadHistory', history);
+          console.log('Cronologia aggiornata, totale elementi:', history.length);
       }
+      
       mainWindow.webContents.send('download-complete', newEntry);
     });
   });
@@ -57,18 +79,32 @@ async function setupDownloadHandler(mainWindow) {
     if (action === 'open') shell.openPath(path).catch(err => console.error("Failed to open path:", err));
     if (action === 'show') shell.showItemInFolder(path);
   });
+  
   ipcMain.on('cancel-download', (event, downloadId) => {
     const download = activeDownloads.get(downloadId);
     if (download) download.item.cancel();
   });
+  
   ipcMain.handle('downloads:get-history', () => {
-      return store.get('downloadHistory', []);
+      const history = store.get('downloadHistory', []);
+      console.log('Richiesta cronologia download, elementi trovati:', history.length);
+      return history;
   });
+  
   ipcMain.handle('downloads:remove-from-history', (event, downloadId) => {
       let history = store.get('downloadHistory', []);
+      const initialLength = history.length;
       history = history.filter(item => item.id !== downloadId);
       store.set('downloadHistory', history);
+      console.log(`Elemento rimosso dalla cronologia: ${downloadId}, elementi rimanenti: ${history.length}`);
       return history;
+  });
+  
+  // Aggiungi un handler per pulire la cronologia
+  ipcMain.handle('downloads:clear-history', () => {
+      store.set('downloadHistory', []);
+      console.log('Cronologia download pulita');
+      return [];
   });
 }
 
