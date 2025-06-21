@@ -82,6 +82,12 @@
     width: 350px;
 }
 
+/* Quando una delle sidebar è visibile, il contenitore principale si restringe */
+#main-content.sidebar-visible #webview-container,
+#main-content.ai-sidebar-visible #webview-container {
+    flex-shrink: 1;
+}
+
 
 /* --- Stili per gli elementi interni della sidebar (invariati) --- */
 #download-sidebar .header { 

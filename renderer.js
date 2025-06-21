@@ -2,6 +2,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mainContent = document.getElementById('main-content');
     
+    // Assicuriamoci che entrambe le sidebar siano chiuse all'avvio
+    mainContent.classList.remove('sidebar-visible');
+    mainContent.classList.remove('ai-sidebar-visible');
+    
     // --- Gestione Sidebar Download ---
     const downloadBtn = document.getElementById('downloadBtn');
     const closeDownloadBtn = document.getElementById('close-download-sidebar');

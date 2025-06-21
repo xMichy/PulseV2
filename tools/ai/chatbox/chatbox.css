@@ -32,6 +32,9 @@ body, html {
     border-radius: 18px;
     max-width: 80%;
     line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
 }
 
 .user {
@@ -43,6 +46,7 @@ body, html {
 
 .ai, .system {
     background-color: #3c3c3c;
+    color: white;
     align-self: flex-start;
     border-bottom-left-radius: 4px;
 }
