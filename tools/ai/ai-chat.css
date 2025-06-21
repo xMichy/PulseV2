@@ -1,0 +1,46 @@
+/* tools/ai/ai-chat.css */
+
+#ai-chat-sidebar {
+    width: 0; /* Nascosta di default */
+    overflow: hidden;
+    background-color: #2e2e2e;
+    color: #f0f0f0;
+    border-left: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.3s ease-in-out;
+}
+
+/* Quando la sidebar dell'AI è visibile */
+#main-content.ai-sidebar-visible #ai-chat-sidebar {
+    width: 380px; /* Un po' più larga per la chat */
+}
+
+#ai-chat-sidebar .header {
+    min-width: 360px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #3a3a3a;
+    flex-shrink: 0;
+}
+
+#ai-chat-sidebar .header h3 {
+    margin: 0;
+}
+
+#ai-chat-sidebar .header button {
+    background: none;
+    border: none;
+    color: #f0f0f0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#ai-chat-webview {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+} 

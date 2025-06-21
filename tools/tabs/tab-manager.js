@@ -167,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
         createNewTab('./tools/settings/settings.html');
     });
 
+    // Ascolta l'evento personalizzato per aprire una nuova scheda dalla chat AI
+    window.addEventListener('open-new-tab', (e) => {
+        if (e.detail && e.detail.url) {
+            createNewTab(e.detail.url);
+        }
+    });
+
     // Inizializza con la prima scheda
     createNewTab();
 });

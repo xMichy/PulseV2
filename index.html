@@ -8,6 +8,8 @@
     </style>
     <link rel="stylesheet" href="./tools/tabs/tab-manager.css">
     <link rel="stylesheet" href="./tools/download/download.css">
+    <link rel="stylesheet" href="./tools/ai/ai-chat.css">
+    <link rel="stylesheet" href="./tools/ai/chatbox/chatbox.css">
 </head>
 <body>
     <div id="app-container">
@@ -22,12 +24,13 @@
             <input type="text" id="urlInput" placeholder="Cerca o inserisci un indirizzo web">
             <button id="goBtn">Vai</button>
             <button id="downloadBtn" style="margin-left: auto;">↓</button>
+            <button id="aiChatBtn">🤖</button>
             <button id="settingsBtn">⚙️</button>
         </div>
 
         <div id="main-content">
             <div id="webview-container">
-                </div>
+            </div>
 
             <div id="download-sidebar">
                 <div class="header">
@@ -39,11 +42,31 @@
                 </div>
                 <div id="download-list"></div>
             </div>
+
+            <div id="ai-chat-sidebar">
+                <div class="header">
+                    <h3>AI Chat</h3>
+                    <button id="close-ai-chat-sidebar">X</button>
+                </div>
+                <div id="chat-container">
+                    <div id="chat-messages">
+                        <div class="message system">
+                            Ciao! Sono l'assistente AI integrato. Come posso aiutarti oggi?
+                        </div>
+                    </div>
+                    <div id="chat-input-container">
+                        <textarea id="chat-input" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                        <button id="send-btn">Invia</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="./renderer.js"></script>
     <script src="./tools/tabs/tab-manager.js"></script>
     <script src="./tools/download/download-manager.js"></script>
+    <script src="./tools/ai/chatbox/chatbox.js"></script>
 </body>
 </html>

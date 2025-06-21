@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld('api', {
   getAllCookies: () => ipcRenderer.invoke('settings:get-all-cookies'),
   deleteCookie: (cookieData) => ipcRenderer.invoke('settings:delete-cookie', cookieData),
 
+  // API specifiche per l'AI
+  sendChatMessage: (message) => ipcRenderer.invoke('ai:chat', message),
+
   // Gestori specifici e chiari per ogni evento di download
   handleDownloadStarted: (callback) => {
     ipcRenderer.on('download-started', (event, ...args) => callback(...args));
@@ -25,5 +28,9 @@ contextBridge.exposeInMainWorld('api', {
   },
   handleDownloadComplete: (callback) => {
     ipcRenderer.on('download-complete', (event, ...args) => callback(...args));
-  }
+  },
+  manageDownloads: (action, data) => ipcRenderer.invoke('manage-downloads', action, data),
+  getDownloadHistory: () => ipcRenderer.invoke('get-download-history'),
+  clearDownloadHistory: () => ipcRenderer.invoke('clear-download-history'),
+  openDownloadsPage: () => ipcRenderer.send('open-downloads-page')
 });
