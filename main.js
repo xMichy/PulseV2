@@ -8,6 +8,14 @@ const { setupAiHandlers } = require('./tools/ai/ai-handler.js');
 
 // La funzione ora è 'async' per poter usare 'await'
 async function createWindow() {
+  // Pulisce la cache della sessione per risolvere errori persistenti
+  try {
+    await session.defaultSession.clearCache();
+    console.log('Cache della sessione pulita con successo.');
+  } catch (error) {
+    console.error('Impossibile pulire la cache della sessione:', error);
+  }
+
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,

@@ -1,15 +1,13 @@
 ﻿// Michele Galliani
-// tools/tabs/tab-manager.js
+// tools/tabs/tab-manager.js - VERSIONE CHROME UI
 document.addEventListener('DOMContentLoaded', () => {
     const tabBar = document.getElementById('tab-bar');
     const newTabBtn = document.getElementById('new-tab-btn');
     const webviewContainer = document.getElementById('webview-container');
-
     const backBtn = document.getElementById('backBtn');
     const fwdBtn = document.getElementById('fwdBtn');
     const reloadBtn = document.getElementById('reloadBtn');
     const urlInput = document.getElementById('urlInput');
-    const goBtn = document.getElementById('goBtn');
     const settingsBtn = document.getElementById('settingsBtn');
 
     let tabs = new Map();
@@ -23,68 +21,73 @@ document.addEventListener('DOMContentLoaded', () => {
         const tabElement = document.createElement('div');
         tabElement.className = 'tab';
         tabElement.dataset.tabId = tabId;
+        
+        // Nuova struttura HTML per la scheda stile Chrome
         tabElement.innerHTML = `
             <img class="tab-icon" src="./tools/tabs/default-icon.png">
             <span class="tab-title">Nuova scheda</span>
-            <button class="close-tab-btn">×</button>
+            <button class="tab-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
+            </button>
         `;
+        // Inserisce la nuova scheda prima del pulsante "+"
         tabBar.insertBefore(tabElement, newTabBtn);
 
         const webview = document.createElement('webview');
         webview.className = 'webview';
         webview.setAttribute('src', url);
-        // CORREZIONE DEFINITIVA: Usa un percorso relativo standard per il preload.
-        // Questo è il modo corretto e non causa crash.
         webview.setAttribute('preload', './preload.js');
-
+        
+        webviewContainer.appendChild(webview);
+        
         tabs.set(tabId, { id: tabId, element: tabElement, webview: webview, title: 'Nuova scheda', isReady: false });
 
-        webviewContainer.appendChild(webview);
-
-        const onDomReady = () => {
+        // Gestori eventi per la webview
+        webview.addEventListener('dom-ready', () => {
             const tab = tabs.get(tabId);
-            if (tab) {
-                tab.isReady = true;
-                if (tabId === activeTabId) {
-                    updateNavControls();
-                }
-            }
-        };
+            if (tab) tab.isReady = true;
+            if (tabId === activeTabId) updateNavControls();
+        });
 
-        webview.addEventListener('dom-ready', onDomReady);
-        
         webview.addEventListener('did-navigate', (e) => {
             if (tabId === activeTabId) {
                 urlInput.value = e.url;
                 updateNavControls();
             }
         });
+
         webview.addEventListener('page-title-updated', (e) => {
             tabElement.querySelector('.tab-title').textContent = e.title;
         });
+
         webview.addEventListener('page-favicon-updated', (e) => {
+            const icon = tabElement.querySelector('.tab-icon');
             if (e.favicons && e.favicons.length > 0) {
-                tabElement.querySelector('.tab-icon').src = e.favicons[0];
+                icon.src = e.favicons[0];
             } else {
-                tabElement.querySelector('.tab-icon').src = './tools/tabs/default-icon.png';
+                icon.src = './tools/tabs/default-icon.png';
             }
         });
 
+        // Gestori eventi per la scheda
         tabElement.addEventListener('click', () => switchToTab(tabId));
-        tabElement.querySelector('.close-tab-btn').addEventListener('click', (e) => {
+        tabElement.querySelector('.tab-close-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             closeTab(tabId);
         });
 
         switchToTab(tabId);
+        return tabId;
     };
 
     const switchToTab = (tabId) => {
+        if (!tabs.has(tabId)) return;
         activeTabId = tabId;
+
         tabs.forEach(tab => {
             const isActive = tab.id === tabId;
             tab.element.classList.toggle('active', isActive);
-            tab.webview.classList.toggle('active', isActive);
+            tab.webview.classList.toggle('hidden', !isActive); // Usa la classe .hidden
         });
         
         updateNavControls();
@@ -103,27 +106,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (remainingTabs.length > 0) {
                 switchToTab(remainingTabs[remainingTabs.length - 1]);
             } else {
-                activeTabId = null; // Resetta l'ID attivo
-                createNewTab();
+                activeTabId = null;
+                createNewTab(); // Crea una nuova scheda se non ne rimangono
             }
         }
     };
 
     const updateNavControls = () => {
         const tab = getActiveTab();
-        if (tab && tab.isReady) {
+        if (tab && tab.isReady && tab.webview) {
             urlInput.value = tab.webview.getURL();
             backBtn.disabled = !tab.webview.canGoBack();
             fwdBtn.disabled = !tab.webview.canGoForward();
         } else {
-            // Se la tab non è pronta, disabilita i controlli
             urlInput.value = '';
             backBtn.disabled = true;
             fwdBtn.disabled = true;
         }
     };
     
-    // Gestori dei controlli di navigazione
+    // Gestori eventi dei controlli
     newTabBtn.addEventListener('click', () => createNewTab());
     backBtn.addEventListener('click', () => getActiveTab()?.webview.goBack());
     fwdBtn.addEventListener('click', () => getActiveTab()?.webview.goForward());
@@ -131,48 +133,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const navigate = () => {
         const input = urlInput.value.trim();
-        if (!input) {
-            return;
-        }
+        if (!input) return;
 
         let finalUrl;
-
-        // Controlla se l'input è un URL valido (contiene un punto, niente spazi, o è localhost)
         const isUrl = (input.includes('.') && !/\s/.test(input)) || input.toLowerCase().startsWith('localhost');
         
         if (isUrl) {
-            // Se è un URL ma manca il protocollo, lo aggiungiamo.
-            if (!/^(https?|file):\/\//.test(input)) {
-                finalUrl = 'https://' + input;
-            } else {
-                finalUrl = input;
-            }
+            finalUrl = (!/^(https?|file):\/\//.test(input)) ? 'https://' + input : input;
         } else {
-            // Altrimenti, lo trattiamo come un termine di ricerca per Google.
             finalUrl = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
         }
         
-        // Carica l'URL nella webview della scheda attiva.
-        getActiveTab()?.webview.loadURL(finalUrl);
+        const activeWebview = getActiveTab()?.webview;
+        if (activeWebview) {
+            activeWebview.loadURL(finalUrl);
+        }
     };
 
-    goBtn.addEventListener('click', navigate);
-
     urlInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            navigate();
-        }
+        if (e.key === 'Enter') navigate();
     });
 
     settingsBtn.addEventListener('click', () => {
         createNewTab('./tools/settings/settings.html');
     });
 
-    // Ascolta l'evento personalizzato per aprire una nuova scheda dalla chat AI
     window.addEventListener('open-new-tab', (e) => {
-        if (e.detail && e.detail.url) {
-            createNewTab(e.detail.url);
-        }
+        if (e.detail && e.detail.url) createNewTab(e.detail.url);
     });
 
     // Inizializza con la prima scheda

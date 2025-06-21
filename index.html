@@ -7,7 +7,7 @@
         * {
             box-sizing: border-box;
         }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; overflow: hidden; background-color: #282a36; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; overflow: hidden; background-color: #f1f3f4; }
     </style>
     <link rel="stylesheet" href="./tools/tabs/tab-manager.css">
     <link rel="stylesheet" href="./tools/download/download.css">
@@ -16,19 +16,29 @@
 </head>
 <body>
     <div id="app-container">
-        <div id="tab-bar">
-            <button id="new-tab-btn">+</button>
+        <div id="title-bar">
+            <div id="tab-bar">
+                <!-- Le schede verranno inserite qui da tab-manager.js -->
+                <button id="new-tab-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
+                </button>
+            </div>
         </div>
 
         <div id="controls">
-            <button id="backBtn" disabled>←</button>
-            <button id="fwdBtn" disabled>→</button>
-            <button id="reloadBtn">↻</button>
-            <input type="text" id="urlInput" placeholder="Cerca o inserisci un indirizzo web">
-            <button id="goBtn">Vai</button>
-            <button id="downloadBtn" style="margin-left: auto;">↓</button>
-            <button id="aiChatBtn">🤖</button>
-            <button id="settingsBtn">⚙️</button>
+            <div id="nav-buttons">
+                <button id="backBtn" disabled><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6l6 6l1.41-1.41L10.83 12z"/></svg></button>
+                <button id="fwdBtn" disabled><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+                <button id="reloadBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg></button>
+            </div>
+            <div id="omnibar">
+                <input type="text" id="urlInput" placeholder="Cerca su Google o digita un URL">
+            </div>
+            <div id="action-buttons">
+                <button id="downloadBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"/></svg></button>
+                <button id="aiChatBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m13.2 21.4l-1.9-1.9c-2.9-2.9-4.3-6.9-4.3-10.5c0-1.8.8-3.5 2.1-4.8C10.5 3 12.1 2.2 14 2.2c1.9 0 3.5.8 4.8 2.1c1.3 1.3 2.1 2.9 2.1 4.8c0 3.6-1.4 7.5-4.3 10.5l-1.9 1.9Zm-2.8-2.8l1.6-1.6c2.4-2.4 3.7-5.8 3.7-9c0-1.4-.6-2.8-1.7-3.9c-1.1-1.1-2.4-1.7-3.9-1.7c-1.4 0-2.8.6-3.9 1.7C5.1 7.6 4.5 9 4.5 10.4c0 3.2 1.2 6.6 3.7 9l1.6 1.6l.6-.6l.8-.8c.4-.4.8-.8 1.1-1.3l.9-1.2l-1-1.1L12 15l-1.1-1.1l-1 1l-.8.8l-.6.5c-.3.3-.6.6-.9.8c-.8.7-1.4 1.4-2 2.1l-.8 1l.6.6ZM12.5 9V7h-1v2h-2v1h2v2h1v-2h2V9h-2Z"/></svg></button>
+                <button id="settingsBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.58-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.49.49 0 0 0-.48-.44H9.17c-.22 0-.42.15-.48.37l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.58.22L2.03 8.85a.49.49 0 0 0 .12.61l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.58.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.22.25.37.48.37h3.67c.22 0 .42-.15.48-.37l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .58-.22l1.92-3.32a.49.49 0 0 0-.12-.61zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5s-1.57 3.5-3.5 3.5"/></svg></button>
+            </div>
         </div>
 
         <div id="main-content">
@@ -39,8 +49,12 @@
                 <div class="header">
                     <h3>Download</h3>
                     <div class="header-actions">
-                        <button id="clear-history-btn" title="Pulisci cronologia">🗑️</button>
-                        <button id="close-download-sidebar">X</button>
+                        <button id="clear-history-btn" title="Pulisci cronologia">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                        <button id="close-download-sidebar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div id="download-list"></div>
@@ -48,8 +62,10 @@
 
             <div id="ai-chat-sidebar">
                 <div class="header">
-                    <h3>AI Chat</h3>
-                    <button id="close-ai-chat-sidebar">X</button>
+                    <h3>Pulse</h3>
+                    <button id="close-ai-chat-sidebar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
+                    </button>
                 </div>
                 <div id="chat-container">
                     <div id="chat-messages">
@@ -59,7 +75,9 @@
                     </div>
                     <div id="chat-input-container">
                         <textarea id="chat-input" placeholder="Scrivi un messaggio..." rows="1"></textarea>
-                        <button id="send-btn">Invia</button>
+                        <button id="send-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8z"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>

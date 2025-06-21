@@ -1,99 +1,241 @@
 ﻿/* Michele Galliani */
 /* tools/tabs/tab-manager.css */
 
-#app-container { display: flex; flex-direction: column; height: 100vh; }
-#main-content { display: flex; flex-grow: 1; overflow: hidden; }
-
-/* Barra delle schede */
-#tab-bar {
+/* Stili generali del contenitore principale dell'app */
+#app-container {
     display: flex;
-    align-items: center;
-    background-color: #21222c;
-    padding: 5px 5px 0 5px;
-    min-height: 40px;
+    flex-direction: column;
+    height: 100vh;
 }
 
-/* Singola scheda */
+/* Stili per la barra del titolo che contiene le schede */
+#title-bar {
+    display: flex;
+    align-items: flex-end;
+    background-color: #dee1e6; /* Grigio chiaro di Chrome */
+    padding: 6px 6px 0;
+    -webkit-app-region: drag; /* Permette di trascinare la finestra */
+}
+
+#tab-bar {
+    display: flex;
+    flex-grow: 1;
+    height: 34px; /* Altezza standard delle schede */
+}
+
+/* Stili per le singole schede */
 .tab {
     display: flex;
     align-items: center;
-    background-color: #44475a;
-    color: #f8f8f2;
-    padding: 8px 10px;
-    margin-right: 2px;
-    border-radius: 5px 5px 0 0;
-    cursor: pointer;
-    border: 1px solid #6272a4;
+    padding: 0 12px;
+    border: 1px solid transparent;
     border-bottom: none;
-    max-width: 200px;
     position: relative;
-    bottom: -1px;
+    color: #3c4043;
+    background-color: #dee1e6;
+    height: 34px;
+    min-width: 80px;
+    max-width: 240px;
+    -webkit-app-region: no-drag; /* Le schede non devono essere trascinabili */
+    user-select: none; /* Impedisce la selezione del testo */
+    transition: background-color 0.2s;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: -1px; /* Sovrappone leggermente le schede */
+}
+
+.tab:before, .tab:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 8px;
+    height: 8px;
+    background: transparent;
+}
+
+/* Effetto di curvatura per le schede */
+.tab:before {
+    left: -8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 4px 4px 0 0 #dee1e6;
+}
+
+.tab:after {
+    right: -8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -4px 4px 0 0 #dee1e6;
 }
 
 .tab.active {
-    background-color: #383a49; /* Colore di sfondo dei controlli per un effetto unito */
-    border-color: #4d4d4d;
+    background-color: #ffffff; /* La scheda attiva è bianca */
+    color: #202124;
+    z-index: 2;
+}
+
+/* Le curve vengono disegnate solo per la scheda attiva per evitare glitch grafici */
+.tab.active:before, .tab.active:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 8px;
+    height: 8px;
+    background: transparent;
+}
+
+.tab.active:before {
+    left: -8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 4px 4px 0 0 #ffffff; /* Colore della scheda attiva */
+}
+
+.tab.active:after {
+    right: -8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -4px 4px 0 0 #ffffff; /* Colore della scheda attiva */
+}
+
+.tab:hover {
+    background-color: #e8eaed; /* Leggero hover */
+}
+.tab.active:hover {
+    background-color: #ffffff; /* La scheda attiva non cambia colore in hover */
 }
 
 .tab-icon {
     width: 16px;
     height: 16px;
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .tab-title {
+    flex-grow: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-grow: 1;
 }
 
-.close-tab-btn {
+.tab-close-btn {
     background: none;
     border: none;
-    color: #f8f8f2;
-    margin-left: 10px;
-    padding: 0 4px;
-    border-radius: 4px;
+    padding: 4px;
+    margin-left: 8px;
+    border-radius: 50%;
     cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Nascosto di default */
+    flex-shrink: 0;
 }
-.close-tab-btn:hover { background-color: #6272a4; }
+.tab:hover .tab-close-btn {
+    opacity: 1; /* Visibile in hover sulla scheda */
+}
+.tab-close-btn:hover {
+    background-color: #d2d4d8;
+}
 
+/* Pulsante per nuova scheda */
 #new-tab-btn {
-    background: #44475a;
-    color: #f8f8f2;
+    background: none;
     border: none;
+    border-radius: 50%;
     width: 28px;
     height: 28px;
-    border-radius: 5px;
-    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    margin-left: 6px;
+    margin-bottom: 2px;
+    -webkit-app-region: no-drag;
+    flex-shrink: 0;
 }
-#new-tab-btn:hover { background: #6272a4; }
+#new-tab-btn:hover {
+    background-color: #d2d4d8;
+}
 
-/* Controlli principali */
+/* Stili per la barra dei controlli (sotto le schede) */
 #controls {
     display: flex;
-    gap: 5px;
+    align-items: center;
     padding: 8px;
-    background-color: #383a49;
-    border-bottom: 1px solid #282a36;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dcdcdc;
 }
-#controls input { flex-grow: 1; padding: 5px; border-radius: 3px; border: 1px solid #6272a4; background: #282a36; color: white; }
-#controls button { padding: 5px 10px; border: 1px solid #6272a4; background: #44475a; color: white; border-radius: 3px; }
-#controls button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Contenitore delle Webview */
-#webview-container { flex-grow: 1; position: relative; }
-webview {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Contenitori per i pulsanti e la omnibar */
+#nav-buttons, #action-buttons {
+    display: flex;
+    align-items: center;
+}
+
+#nav-buttons button, #action-buttons button {
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #5f6368;
+}
+#nav-buttons button:hover, #action-buttons button:hover {
+    background-color: #f1f3f4;
+}
+#nav-buttons button:disabled {
+    color: #bdc1c6;
+    cursor: default;
+    background-color: transparent;
+}
+
+
+/* Stili per la omnibar/barra degli indirizzi */
+#omnibar {
+    flex-grow: 1;
+    margin: 0 8px;
+    position: relative;
+}
+
+#urlInput {
+    width: 100%;
+    height: 36px;
+    border-radius: 18px; /* Angoli arrotondati */
+    border: 1px solid #dcdcdc;
+    background-color: #f1f3f4;
+    padding: 0 20px;
+    font-size: 14px;
+    color: #202124;
+}
+#urlInput:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: #a8c7fa;
+    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+/* Contenitore per le viste web */
+#main-content {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    background-color: #fff; /* Sfondo bianco per l'area del contenuto */
+}
+#webview-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.webview {
+    flex-grow: 1;
+    border: none;
     width: 100%;
     height: 100%;
-    background-color: white;
 }
-/* Nascondiamo le webview non attive */
-webview:not(.active) {
+.hidden {
     display: none;
 }

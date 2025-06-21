@@ -32,6 +32,6 @@
     "win": {
       "target": "nsis"
     },
-    "asar": false
+    "asar": true
   }
 }
