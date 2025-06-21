@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
     const chatInput = document.getElementById('chat-input');

@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 const { ipcMain } = require('electron');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 

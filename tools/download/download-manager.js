@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 // tools/download/download-manager.js
 document.addEventListener('DOMContentLoaded', () => {
     const downloadList = document.getElementById('download-list');

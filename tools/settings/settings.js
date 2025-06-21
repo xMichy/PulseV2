@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 // tools/settings/settings.js
 document.addEventListener('DOMContentLoaded', () => {
     const cookieContainer = document.getElementById('cookie-list-container');

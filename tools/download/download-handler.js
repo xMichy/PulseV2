@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 // tools/download/download-handler.js
 const { ipcMain, shell, session } = require('electron');
 

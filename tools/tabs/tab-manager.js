@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 // tools/tabs/tab-manager.js
 document.addEventListener('DOMContentLoaded', () => {
     const tabBar = document.getElementById('tab-bar');

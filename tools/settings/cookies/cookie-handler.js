@@ -1,3 +1,4 @@
+﻿// Michele Galliani
 // tools/settings/cookies/cookie-handler.js
 const { ipcMain, session } = require('electron');
 
